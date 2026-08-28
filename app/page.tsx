@@ -23,7 +23,7 @@ interface CaseData {
 export default function ProceduralCriminalCasePage() {
   const [caseData, setCaseData] = useState<CaseData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedSuspect, setSelectedSuspect] = useState<Suspect null |>(null);
+  const [selectedSuspect, setSelectedSuspect] = useState<Suspect | null>(null);
   const [verdict, setVerdict] = useState<string | null>(null);
 
   useEffect(() => {
@@ -82,7 +82,13 @@ export default function ProceduralCriminalCasePage() {
         </div>
         <div className="relative aspect-[16/10] bg-neutral-800 rounded-xl overflow-hidden border border-neutral-700">
           {caseData.initialImageUrl && (
-            <Image alt="Crime Scene" className="object-cover" fill sizes="(max-width: 1200px) 100vw, 50vw" src="{caseData.initialImageUrl}"/>
+            <Image 
+              src={caseData.initialImageUrl} 
+              alt="Crime Scene" 
+              fill 
+              className="object-cover" 
+              sizes="(max-width: 1200px) 100vw, 50vw"
+            />
           )}
         </div>
       </section>
@@ -103,7 +109,13 @@ export default function ProceduralCriminalCasePage() {
             >
               <div className="relative w-32 h-32 rounded-full overflow-hidden mb-4 border-2 border-neutral-700">
                 {suspect.imageUrl && (
-                  <Image alt="{suspect.name}" className="object-cover" fill sizes="128px" src="{suspect.imageUrl}"/>
+                  <Image 
+                    src={suspect.imageUrl} 
+                    alt={suspect.name} 
+                    fill 
+                    className="object-cover" 
+                    sizes="128px"
+                  />
                 )}
               </div>
               <h4 className="text-xl font-semibold">{suspect.name}</h4>
