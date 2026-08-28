@@ -3,31 +3,29 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
-// Yapay zekadan gelecek dinamik veri yapısı
-interface CaseData {
-  caseTitle: string;
-  locationDescription: string;
-  initialImageUrl: string | null; // Başlangıç mekanı resmi
-  suspects: Suspect[];
-}
-
 interface Suspect {
   id: string;
   name: string;
   role: string;
-  alibiPrompt: string; // LLM'den gelecek gizli prompt
+  alibiPrompt: string;
   dialogue: string;
-  imageUrl: string | null; // AI tarafından üretilecek şüpheli resmi
+  imageUrl: string | null;
   isGuilty: boolean;
+}
+
+interface CaseData {
+  caseTitle: string;
+  locationDescription: string;
+  initialImageUrl: string | null;
+  suspects: Suspect[];
 }
 
 export default function ProceduralCriminalCasePage() {
   const [caseData, setCaseData] = useState<CaseData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedSuspect, setSelectedSuspect] = useState<Suspect | null>(null);
+  const [selectedSuspect, setSelectedSuspect] = useState<Suspect null |>(null);
   const [verdict, setVerdict] = useState<string | null>(null);
 
-  // Sayfa yüklendiğinde yeni bir vaka oluştur (API call simülasyonu)
   useEffect(() => {
     generateNewCase();
   }, []);
@@ -37,20 +35,17 @@ export default function ProceduralCriminalCasePage() {
     setVerdict(null);
     setSelectedSuspect(null);
 
-    // Burası gerçek API çağrısını yapacağın yer (Groq/Gemini + Stable Diffusion/DALL-E)
-    // Şu an için simüle edilmiş veri kullanıyoruz:
     const mockCaseData: CaseData = {
       caseTitle: "Gölge Konağı Cinayeti",
       locationDescription: "Eski, loş ışıklı bir kütüphane. Kırmızı kadife perdeler ve tozlu kitap rafları...",
-      initialImageUrl: "/images/library_placeholder.jpg", // Örnek resim yolu
+      initialImageUrl: "/images/library_placeholder.jpg",
       suspects: [
-        { id: "s1", name: "Kerem", role: "Uşak", alibiPrompt: "AI, Kerem'in ifadesini korkmuş ve şüpheli bir dille yaz.", dialogue: "O sırada gümüşleri parlatıyordum, efendim.", imageUrl: "/images/suspect_kerem.jpg", isGuilty: false },
-        { id: "s2", name: "Aylin", role: "Mirasçı", alibiPrompt: "AI, Aylin'in ifadesini soğukkanlı ve kibirli bir dille yaz.", dialogue: "Odama çekilmiştim, kimseyi görmedim.", imageUrl: "/images/suspect_aylin.jpg", isGuilty: true },
-        { id: "s3", name: "Murat", role: "Bahçıvan", alibiPrompt: "AI, Murat'ın ifadesini yorgun ve dürüst bir dille yaz.", dialogue: "Seraları kontrol ediyordum, her zamanki işim.", imageUrl: "/images/suspect_murat.jpg", isGuilty: false },
+        { id: "s1", name: "Kerem", role: "Uşak", alibiPrompt: "", dialogue: "O sırada gümüşleri parlatıyordum, efendim.", imageUrl: "/images/suspect_kerem.jpg", isGuilty: false },
+        { id: "s2", name: "Aylin", role: "Mirasçı", alibiPrompt: "", dialogue: "Odama çekilmiştim, kimseyi görmedim.", imageUrl: "/images/suspect_aylin.jpg", isGuilty: true },
+        { id: "s3", name: "Murat", role: "Bahçıvan", alibiPrompt: "", dialogue: "Seraları kontrol ediyordum, her zamanki işim.", imageUrl: "/images/suspect_murat.jpg", isGuilty: false },
       ],
     };
 
-    // Gerçek API'de LLM metni üretecek, resim API'si de alibiPrompt'u resme dönüştürecek.
     setCaseData(mockCaseData);
     setLoading(false);
   };
@@ -63,8 +58,8 @@ export default function ProceduralCriminalCasePage() {
     }
   };
 
-  if (loading) return <div className="text-white">Yapay Zeka Hikaye ve Görselleri Üretiyor...</div>;
-  if (!caseData) return <div className="text-white">Hata Oluştu!</div>;
+  if (loading) return <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">Yapay Zeka Hikaye ve Görselleri Üretiyor...</div>;
+  if (!caseData) return <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">Hata Oluştu!</div>;
 
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100 p-8 flex flex-col items-center">
@@ -87,13 +82,7 @@ export default function ProceduralCriminalCasePage() {
         </div>
         <div className="relative aspect-[16/10] bg-neutral-800 rounded-xl overflow-hidden border border-neutral-700">
           {caseData.initialImageUrl && (
-            <Image 
-              src={caseData.initialImageUrl} 
-              alt="Crime Scene" 
-              fill 
-              className="object-cover" 
-              sizes="(max-w-6xl) 50vw, 33vw"
-            />
+            <Image alt="Crime Scene" className="object-cover" fill sizes="(max-width: 1200px) 100vw, 50vw" src="{caseData.initialImageUrl}"/>
           )}
         </div>
       </section>
@@ -106,11 +95,15 @@ export default function ProceduralCriminalCasePage() {
             <div
               key={suspect.id}
               onClick={() => { setSelectedSuspect(suspect); setVerdict(null); }}
-              className={`p-6 border rounded-2xl cursor-pointer transition flex flex-col items-center ${selectedSuspect?.id === suspect.id ? "border-red-600 bg-neutral-900" : "border-neutral-800 bg-neutral-900/50 hover:border-neutral-700"}`}
+              className={`p-6 border rounded-2xl cursor-pointer transition flex flex-col items-center ${
+                selectedSuspect?.id === suspect.id 
+                  ? "border-red-600 bg-neutral-900" 
+                  : "border-neutral-800 bg-neutral-900/50 hover:border-neutral-700"
+              }`}
             >
               <div className="relative w-32 h-32 rounded-full overflow-hidden mb-4 border-2 border-neutral-700">
                 {suspect.imageUrl && (
-                  <Image src={suspect.imageUrl} alt={suspect.name} fill className="object-cover" sizes="128px" />
+                  <Image alt="{suspect.name}" className="object-cover" fill sizes="128px" src="{suspect.imageUrl}"/>
                 )}
               </div>
               <h4 className="text-xl font-semibold">{suspect.name}</h4>
@@ -133,7 +126,7 @@ export default function ProceduralCriminalCasePage() {
               SUÇLA VE DOSYAYI KAPAT
             </button>
           </div>
-        </div>
+        </section>
       )}
 
       {/* Karar / Sonuç Mesajı */}
