@@ -5,7 +5,15 @@ export async function POST(req: NextRequest) {
     const { text, voiceId = '21m00Tcm4TlvDq8ikWAM' } = await req.json();
 
     if (!text) {
-      return NextResponse.json({ error: 'Metin gerekli' }, { status: 400 });
+      return NextResponse.json({ error: 'Metin girmediniz.' }, { status: 400 });
+    }
+
+    const apiKey = process.env.ELEVENLABS_API_KEY;
+
+    // API Key kontrolü
+    if (!apiKey) {
+      console.error('ELEVENLABS_API_KEY bulunamadı!');
+      return NextResponse.json({ error: 'Vercel tarafında API anahtarı tanımlı değil.' }, { status: 500 });
     }
 
     const response = await fetch(
@@ -15,11 +23,11 @@ export async function POST(req: NextRequest) {
         headers: {
           'Accept': 'audio/mpeg',
           'Content-Type': 'application/json',
-          'xi-api-key': process.env.ELEVENLABS_API_KEY!,
+          'xi-api-key': apiKey.trim(),
         },
         body: JSON.stringify({
           text: text,
-          model_id: 'eleven_multilingual_v2', // Türkçe desteği için en iyi model
+          model_id: 'eleven_multilingual_v2',
           voice_settings: {
             stability: 0.5,
             similarity_boost: 0.75,
@@ -29,7 +37,12 @@ export async function POST(req: NextRequest) {
     );
 
     if (!response.ok) {
-      throw new Error(`ElevenLabs API hatası: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('ElevenLabs Yanıt Hatası:', response.status, errorText);
+      return NextResponse.json(
+        { error: `ElevenLabs Hatası (${response.status}): ${errorText}` },
+        { status: response.status }
+      );
     }
 
     const audioBuffer = await response.arrayBuffer();
@@ -37,10 +50,11 @@ export async function POST(req: NextRequest) {
     return new NextResponse(audioBuffer, {
       headers: {
         'Content-Type': 'audio/mpeg',
+        'Cache-Control': 'no-store, max-age=0',
       },
     });
   } catch (error: any) {
+    console.error('Sunucu Hatası:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-
