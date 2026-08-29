@@ -10,38 +10,26 @@ interface Option {
 
 interface StoryStep {
   storyText: string;
-  category: string; // "office", "street", "clue", "shadow", "police", "crime"
   options: Option[];
 }
 
-// Konseptlere özel garantili ve yüksek kaliteli dedektif görselleri
-const IMAGE_BANK: Record<string, string[]> = {
-  office: [
-    "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=800&q=80",
-  ],
-  street: [
-    "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1508873696983-2df515122519?auto=format&fit=crop&w=800&q=80",
-  ],
-  clue: [
-    "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80",
-  ],
-  shadow: [
-    "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?auto=format&fit=crop&w=800&q=80",
-  ],
-  default: [
-    "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80",
-  ],
-};
+// Oyun kolu çıkmasını imkansız kılan GARANTİLİ dedektif fotoğrafları listesi
+const DETECTIVE_IMAGES = [
+  "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80", // Karanlık sokak / dedektif
+  "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=800&q=80", // Not defteri ve kalem
+  "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=800&q=80", // Gece şehir ışıkları
+  "https://images.unsplash.com/photo-1508873696983-2df515122519?auto=format&fit=crop&w=800&q=80", // Sisli yol
+  "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80", // Hukuk / dava dosyaları
+  "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80", // Matrix / veri takibi
+  "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?auto=format&fit=crop&w=800&q=80", // Karanlık koridor
+  "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80", // Gölge ve adam
+];
 
 export default function InteractiveStoryPage() {
   const [currentStep, setCurrentStep] = useState<StoryStep | null>(null);
   const [history, setHistory] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string>(DETECTIVE_IMAGES[0]);
 
   useEffect(() => {
     startNewStory();
@@ -53,16 +41,15 @@ export default function InteractiveStoryPage() {
     return sentences.slice(0, sentenceCount).join(" ");
   };
 
-  const getCategorizedImage = (category: string) => {
-    const list = IMAGE_BANK[category?.toLowerCase()] || IMAGE_BANK.default;
-    const randomImg = list[Math.floor(Math.random() * list.length)];
-    setImageUrl(randomImg);
+  const pickRandomDetectiveImage = () => {
+    const randomIndex = Math.floor(Math.random() * DETECTIVE_IMAGES.length);
+    setImageUrl(DETECTIVE_IMAGES[randomIndex]);
   };
 
   const startNewStory = async () => {
     setLoading(true);
     setHistory([]);
-    setImageUrl(null);
+    pickRandomDetectiveImage();
     try {
       const res = await fetch("/api/story", {
         method: "POST",
@@ -72,7 +59,6 @@ export default function InteractiveStoryPage() {
       const data: StoryStep = await res.json();
       setCurrentStep(data);
       setHistory([data.storyText]);
-      getCategorizedImage(data.category);
     } catch (err) {
       console.error("Story error:", err);
     } finally {
@@ -84,6 +70,7 @@ export default function InteractiveStoryPage() {
     if (loading || !currentStep) return;
 
     setLoading(true);
+    pickRandomDetectiveImage();
     const newHistory = [...history, `Seçim: ${option.id} - ${option.text}`];
 
     try {
@@ -99,7 +86,6 @@ export default function InteractiveStoryPage() {
       const data: StoryStep = await res.json();
       setCurrentStep(data);
       setHistory([...newHistory, data.storyText]);
-      getCategorizedImage(data.category);
     } catch (err) {
       console.error("Story update error:", err);
     } finally {
@@ -134,18 +120,14 @@ export default function InteractiveStoryPage() {
           <>
             {/* Görsel Alanı */}
             <div className="relative w-full aspect-[16/9] bg-neutral-950 rounded-xl overflow-hidden border border-neutral-800 flex items-center justify-center">
-              {imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt="Scene"
-                  className="w-full h-full object-cover transition-all duration-300"
-                />
-              ) : (
-                <div className="text-neutral-600 text-xs">Görsel Yükleniyor...</div>
-              )}
+              <img
+                src={imageUrl}
+                alt="Detective Scene"
+                className="w-full h-full object-cover transition-all duration-300"
+              />
             </div>
 
-            {/* Metin (KOD TARAFINDA İLK 2 CÜMLEYE KESİLMİŞ) */}
+            {/* Metin */}
             <div className="bg-neutral-950 border border-neutral-800/80 p-4 rounded-xl text-neutral-200 text-sm leading-snug font-medium">
               {currentStep?.storyText ? truncateStory(currentStep.storyText, 2) : ""}
             </div>
@@ -172,4 +154,4 @@ export default function InteractiveStoryPage() {
       </div>
     </main>
   );
-              }
+}
