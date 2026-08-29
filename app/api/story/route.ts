@@ -22,14 +22,14 @@ export async function POST(req: Request) {
     ${chosenOption || "Oyun yeni başladı."}
 
     GÖREVLER:
-    1. "storyText": Sadece yapılan aksiyonun doğrudan sonucunu yaz (Maksimum 10 kısa cümle). Anlatıyı uzatma.
-    2. "imagePrompt": Sahneye özel 2-3 kelimelik İngilizce detay yaz (Örn: "bloody knife on floor", "dark alley rainy night", "police car lights").
+    1. "storyText": Sadece yapılan aksiyonun sonucunu yaz (Maksimum 2 kısa cümle). Anlatıyı uzatma.
+    2. "searchKeyword": Sahneye uygun 1-2 kelimelik İngilizce arama terimi yaz (Örn: "blood", "knife", "footprint", "police", "office", "shadow").
     3. "options": Tam 4 tane net aksiyon seçeneği sun (A, B, C ve Bonus).
 
     ÇIKTI FORMATI (SADECE JSON):
     {
       "storyText": "Metin...",
-      "imagePrompt": "İngilizce kelimeler...",
+      "searchKeyword": "kelime",
       "options": [
         { "id": "A", "text": "Seçenek 1" },
         { "id": "B", "text": "Seçenek 2" },
