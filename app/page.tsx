@@ -75,7 +75,7 @@ export default function InteractiveStoryPage() {
         <header className="flex justify-between items-center border-b border-neutral-800 pb-4">
           <div className="flex items-center gap-2 text-red-500 font-bold tracking-wider">
             <BookOpen className="w-5 h-5" />
-            <span>INTERACTIVE DETECTIVE</span>
+            <span>Whodunnit</span>
           </div>
           <button
             onClick={startNewStory}
@@ -89,7 +89,7 @@ export default function InteractiveStoryPage() {
         {loading ? (
           <div className="min-h-[220px] flex flex-col items-center justify-center gap-3 text-neutral-400">
             <LoaderCircle className="w-8 h-8 animate-spin text-red-600" />
-            <p className="text-xs tracking-wide">Yapay zeka olayın devamını kurguluyor...</p>
+            <p className="text-xs tracking-wide">Yapay zeka olayı kurguluyor...</p>
           </div>
         ) : (
           <>
