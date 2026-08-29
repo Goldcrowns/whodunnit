@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LoaderCircle, BookOpen, RefreshCw } from "lucide-react";
+import { LoaderCircle, BookOpen, RefreshCw, Search } from "lucide-react";
 
 interface Option {
   id: string;
