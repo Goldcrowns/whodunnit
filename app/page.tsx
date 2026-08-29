@@ -10,9 +10,32 @@ interface Option {
 
 interface StoryStep {
   storyText: string;
-  searchKeyword: string;
+  category: string; // "office", "street", "clue", "shadow", "police", "crime"
   options: Option[];
 }
+
+// Konseptlere özel garantili ve yüksek kaliteli dedektif görselleri
+const IMAGE_BANK: Record<string, string[]> = {
+  office: [
+    "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=800&q=80",
+  ],
+  street: [
+    "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1508873696983-2df515122519?auto=format&fit=crop&w=800&q=80",
+  ],
+  clue: [
+    "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80",
+  ],
+  shadow: [
+    "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?auto=format&fit=crop&w=800&q=80",
+  ],
+  default: [
+    "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80",
+  ],
+};
 
 export default function InteractiveStoryPage() {
   const [currentStep, setCurrentStep] = useState<StoryStep | null>(null);
@@ -24,18 +47,16 @@ export default function InteractiveStoryPage() {
     startNewStory();
   }, []);
 
-  // Metni kod tarafında kesen fonksiyon (Varsayılan: İlk 2 Cümle)
   const truncateStory = (text: string, sentenceCount: number = 2) => {
     if (!text) return "";
     const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
     return sentences.slice(0, sentenceCount).join(" ");
   };
 
-  const updateImage = (keyword: string) => {
-    const cleanKeyword = keyword ? encodeURIComponent(keyword.trim().toLowerCase()) : "detective";
-    const sig = Math.floor(Math.random() * 9999);
-    // Unsplash temalı görsel çekimi
-    setImageUrl(`https://source.unsplash.com/800x450/?dark,detective,${cleanKeyword}&sig=${sig}`);
+  const getCategorizedImage = (category: string) => {
+    const list = IMAGE_BANK[category?.toLowerCase()] || IMAGE_BANK.default;
+    const randomImg = list[Math.floor(Math.random() * list.length)];
+    setImageUrl(randomImg);
   };
 
   const startNewStory = async () => {
@@ -51,7 +72,7 @@ export default function InteractiveStoryPage() {
       const data: StoryStep = await res.json();
       setCurrentStep(data);
       setHistory([data.storyText]);
-      if (data.searchKeyword) updateImage(data.searchKeyword);
+      getCategorizedImage(data.category);
     } catch (err) {
       console.error("Story error:", err);
     } finally {
@@ -78,7 +99,7 @@ export default function InteractiveStoryPage() {
       const data: StoryStep = await res.json();
       setCurrentStep(data);
       setHistory([...newHistory, data.storyText]);
-      if (data.searchKeyword) updateImage(data.searchKeyword);
+      getCategorizedImage(data.category);
     } catch (err) {
       console.error("Story update error:", err);
     } finally {
@@ -111,25 +132,20 @@ export default function InteractiveStoryPage() {
           </div>
         ) : (
           <>
-            {/* Görsel Alanı (Garantili Fallback Dahil) */}
+            {/* Görsel Alanı */}
             <div className="relative w-full aspect-[16/9] bg-neutral-950 rounded-xl overflow-hidden border border-neutral-800 flex items-center justify-center">
               {imageUrl ? (
                 <img
                   src={imageUrl}
                   alt="Scene"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    // Servis patlarsa doğrudan bu güvenli static stok görsele düşer
-                    (e.target as HTMLImageElement).src =
-                      "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80";
-                  }}
+                  className="w-full h-full object-cover transition-all duration-300"
                 />
               ) : (
                 <div className="text-neutral-600 text-xs">Görsel Yükleniyor...</div>
               )}
             </div>
 
-            {/* Kod Tarafında 2 Cümleye Kesilmiş Metin */}
+            {/* Metin (KOD TARAFINDA İLK 2 CÜMLEYE KESİLMİŞ) */}
             <div className="bg-neutral-950 border border-neutral-800/80 p-4 rounded-xl text-neutral-200 text-sm leading-snug font-medium">
               {currentStep?.storyText ? truncateStory(currentStep.storyText, 2) : ""}
             </div>
@@ -156,4 +172,4 @@ export default function InteractiveStoryPage() {
       </div>
     </main>
   );
-}
+              }
