@@ -108,9 +108,7 @@ export default function InteractiveStoryPage() {
 
       if (data.imagePrompt) updateImage(data.imagePrompt);
 
-      // Metni kesip seslendir
-      const truncated = truncateStory(data.storyText, 2);
-      speakText(truncated);
+      // Otomatik okuma kaldırıldı (İstek üzerine sadece buton ile tetiklenecek)
     } catch (err) {
       console.error("Story error:", err);
     } finally {
@@ -147,9 +145,7 @@ export default function InteractiveStoryPage() {
 
       if (data.imagePrompt) updateImage(data.imagePrompt);
 
-      // Yeni adımı seslendir
-      const truncated = truncateStory(data.storyText, 2);
-      speakText(truncated);
+      // Otomatik okuma kaldırıldı (İstek üzerine sadece buton ile tetiklenecek)
     } catch (err) {
       console.error("Story update error:", err);
     } finally {
@@ -202,18 +198,7 @@ export default function InteractiveStoryPage() {
           </div>
         ) : (
           <>
-            {/* Görsel Alanı */}
-            <div className="relative w-full aspect-[16/9] bg-neutral-950 rounded-xl overflow-hidden border border-neutral-800 flex items-center justify-center">
-              {imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt="Scene"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="text-neutral-600 text-xs">Görsel Yükleniyor...</div>
-              )}
-            </div>
+            {/* Görsel Alanı Kaldırıldı */}
 
             {/* Kod ile 2 cümleye kesilmiş kısa metin */}
             <div className="bg-neutral-950 border border-neutral-800/80 p-4 rounded-xl text-neutral-200 text-sm leading-snug font-medium relative">
