@@ -22,14 +22,14 @@ export async function POST(req: Request) {
     ${chosenOption || "Oyun yeni başladı."}
 
     GÖREVLER:
-    1. "storyText": Sadece yapılan aksiyonun sonucunu yaz (Maksimum 2 kısa cümle). Anlatıyı uzatma.
-    2. "searchKeyword": Sahneye uygun 1-2 kelimelik İngilizce arama terimi yaz (Örn: "blood", "knife", "footprint", "police", "office", "shadow").
+    1. "storyText": Sadece yapılan aksiyonun doğrudan sonucunu yaz (En fazla 2 kısa cümle).
+    2. "category": Sahnenin türüne göre şu 4 kategoriden SADECE BİRİNİ seç: "office", "street", "clue", "shadow".
     3. "options": Tam 4 tane net aksiyon seçeneği sun (A, B, C ve Bonus).
 
     ÇIKTI FORMATI (SADECE JSON):
     {
       "storyText": "Metin...",
-      "searchKeyword": "kelime",
+      "category": "clue",
       "options": [
         { "id": "A", "text": "Seçenek 1" },
         { "id": "B", "text": "Seçenek 2" },
@@ -51,3 +51,4 @@ export async function POST(req: Request) {
     );
   }
 }
+
