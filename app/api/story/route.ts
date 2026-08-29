@@ -23,13 +23,13 @@ export async function POST(req: Request) {
 
     GÖREVLERİN:
     1. Hikayeyi sürükleyici bir şekilde devam ettir (Türkçe).
-    2. Mevcut sahne ortamını aramak için tam olarak 1 veya 2 kelimelik İngilizce Unsplash arama terimi ("searchKeyword") belirle (Örn: "dark-room", "rainy-street", "detective", "old-book", "blood-stain", "police-car").
-    3. Oyuncuya 3 adet seçenek sun (A, B, C).
+    2. Mevcut sahne ortamı için 1-2 kelimelik İngilizce görsel anahtar kelimesi ("searchKeyword") belirle (Örn: "rainy-street", "detective-office", "old-letter", "crime-scene", "shadowy-figure").
+    3. Oyuncuya 3 adet seçenek sun (A, B, C ve BONUS).
 
     ÇIKTI FORMATI (SADECE JSON):
     {
       "storyText": "Hikayenin mevcut durumu...",
-      "searchKeyword": "dark-street",
+      "searchKeyword": "detective-office",
       "options": [
         { "id": "A", "text": "Birinci seçenek" },
         { "id": "B", "text": "İkinci seçenek" },
