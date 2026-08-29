@@ -40,7 +40,14 @@ export default function InteractiveStoryPage() {
   const speakText = async (textToSpeak: string) => {
     if (!textToSpeak) return;
 
-    // Eğer çalan eski bir ses varsa durdur
+    // Eğer hali hazırda ses çalıyorsa, butona tekrar basıldığında sesi durdur (Toggle özelliği)
+    if (isSpeaking && currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+      setIsSpeaking(false);
+      return;
+    }
+
     if (currentAudioRef.current) {
       currentAudioRef.current.pause();
       currentAudioRef.current = null;
@@ -107,8 +114,6 @@ export default function InteractiveStoryPage() {
       setHistory([data.storyText]);
 
       if (data.imagePrompt) updateImage(data.imagePrompt);
-
-      // Otomatik okuma kaldırıldı (İstek üzerine sadece buton ile tetiklenecek)
     } catch (err) {
       console.error("Story error:", err);
     } finally {
@@ -144,8 +149,6 @@ export default function InteractiveStoryPage() {
       setHistory([...newHistory, data.storyText]);
 
       if (data.imagePrompt) updateImage(data.imagePrompt);
-
-      // Otomatik okuma kaldırıldı (İstek üzerine sadece buton ile tetiklenecek)
     } catch (err) {
       console.error("Story update error:", err);
     } finally {
@@ -165,20 +168,20 @@ export default function InteractiveStoryPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Dinleme / Tekrar Oynatma Butonu */}
+            {/* Dinleme / Durdurma Kontrol Butonu */}
             {currentStep?.storyText && (
               <button
                 onClick={() => speakText(truncateStory(currentStep.storyText, 2))}
-                disabled={isSpeaking || loading}
+                disabled={loading}
                 className={`text-xs px-2.5 py-1.5 rounded-lg border transition flex items-center gap-1.5 ${
                   isSpeaking
                     ? "bg-red-950/50 border-red-800 text-red-400 animate-pulse"
                     : "bg-neutral-800 border-neutral-700 hover:bg-neutral-700 text-neutral-300"
                 }`}
-                title="Hikayeyi Seslendir"
+                title={isSpeaking ? "Sesi Durdur" : "Hikayeyi Seslendir"}
               >
-                {isSpeaking ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-                <span>{isSpeaking ? "Okunuyor..." : "Oku"}</span>
+                {isSpeaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                <span>{isSpeaking ? "Durdur" : "Oku"}</span>
               </button>
             )}
 
@@ -198,8 +201,6 @@ export default function InteractiveStoryPage() {
           </div>
         ) : (
           <>
-            {/* Görsel Alanı Kaldırıldı */}
-
             {/* Kod ile 2 cümleye kesilmiş kısa metin */}
             <div className="bg-neutral-950 border border-neutral-800/80 p-4 rounded-xl text-neutral-200 text-sm leading-snug font-medium relative">
               {currentStep?.storyText ? truncateStory(currentStep.storyText, 2) : ""}
