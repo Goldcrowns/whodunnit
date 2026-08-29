@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LoaderCircle, BookOpen, RefreshCw } from "lucide-react";
+import { LoaderCircle, BookOpen, RefreshCw, Search} from "lucide-react";
 
 interface Option {
   id: string; // "A", "B", "C"
@@ -74,14 +74,14 @@ export default function InteractiveStoryPage() {
         {/* Header */}
         <header className="flex justify-between items-center border-b border-neutral-800 pb-4">
           <div className="flex items-center gap-2 text-red-500 font-bold tracking-wider">
-            <BookOpen className="w-5 h-5" />
-            <span>Whodunnit</span>
+            <Search className="w-5 h-5" />
+            <span>WHODUNNİT</span>
           </div>
           <button
             onClick={startNewStory}
             className="text-xs bg-neutral-800 hover:bg-neutral-700 px-3 py-1.5 rounded-lg text-neutral-300 transition flex items-center gap-1.5"
           >
-            <RefreshCw className="w-3.5 h-3.5" /> Yeniden Başlat
+            <RefreshCw className="w-3.5 h-3.5" /> Yeni Hikaye Başlat
           </button>
         </header>
 
