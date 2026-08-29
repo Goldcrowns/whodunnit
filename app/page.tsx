@@ -1,15 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LoaderCircle, BookOpen, RefreshCw, Search} from "lucide-react";
+import Image from "next/image";
+import { LoaderCircle, BookOpen, RefreshCw } from "lucide-react";
 
 interface Option {
-  id: string; // "A", "B", "C"
+  id: string;
   text: string;
 }
 
 interface StoryStep {
   storyText: string;
+  searchKeyword: string; // Stok fotoğraf aramak için İngilizce kelime (Örn: "dark alley", "detective office")
   options: Option[];
 }
 
@@ -17,14 +19,22 @@ export default function InteractiveStoryPage() {
   const [currentStep, setCurrentStep] = useState<StoryStep | null>(null);
   const [history, setHistory] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     startNewStory();
   }, []);
 
+  const fetchStockImage = (keyword: string) => {
+    // Unsplash Source kullanarak keyword'e uygun gerçek stok fotoğrafı getirir
+    const encodedKeyword = encodeURIComponent(keyword);
+    setImageUrl(`https://source.unsplash.com/800x450/?${encodedKeyword}`);
+  };
+
   const startNewStory = async () => {
     setLoading(true);
     setHistory([]);
+    setImageUrl(null);
     try {
       const res = await fetch("/api/story", {
         method: "POST",
@@ -34,6 +44,7 @@ export default function InteractiveStoryPage() {
       const data: StoryStep = await res.json();
       setCurrentStep(data);
       setHistory([data.storyText]);
+      if (data.searchKeyword) fetchStockImage(data.searchKeyword);
     } catch (err) {
       console.error("Story start error:", err);
     } finally {
@@ -60,6 +71,7 @@ export default function InteractiveStoryPage() {
       const data: StoryStep = await res.json();
       setCurrentStep(data);
       setHistory([...newHistory, data.storyText]);
+      if (data.searchKeyword) fetchStockImage(data.searchKeyword);
     } catch (err) {
       console.error("Story update error:", err);
     } finally {
@@ -74,31 +86,45 @@ export default function InteractiveStoryPage() {
         {/* Header */}
         <header className="flex justify-between items-center border-b border-neutral-800 pb-4">
           <div className="flex items-center gap-2 text-red-500 font-bold tracking-wider">
-            <Search className="w-5 h-5" />
-            <span>WHODUNNİT</span>
+            <BookOpen className="w-5 h-5" />
+            <span>INTERACTIVE DETECTIVE</span>
           </div>
           <button
             onClick={startNewStory}
             className="text-xs bg-neutral-800 hover:bg-neutral-700 px-3 py-1.5 rounded-lg text-neutral-300 transition flex items-center gap-1.5"
           >
-            <RefreshCw className="w-3.5 h-3.5" /> Yeni Hikaye Başlat
+            <RefreshCw className="w-3.5 h-3.5" /> Yeniden Başlat
           </button>
         </header>
 
-        {/* Loading Indicator */}
         {loading ? (
-          <div className="min-h-[220px] flex flex-col items-center justify-center gap-3 text-neutral-400">
+          <div className="min-h-[300px] flex flex-col items-center justify-center gap-3 text-neutral-400">
             <LoaderCircle className="w-8 h-8 animate-spin text-red-600" />
-            <p className="text-xs tracking-wide">Yapay zeka olayı kurguluyor...</p>
+            <p className="text-xs tracking-wide">Hikaye ve mekan fotoğrafları hazırlanıyor...</p>
           </div>
         ) : (
           <>
-            {/* Story Text Area */}
-            <div className="min-h-[160px] bg-neutral-950 border border-neutral-800/80 p-5 rounded-xl text-neutral-200 text-sm md:text-base leading-relaxed">
+            {/* Stok Fotoğraf Alanı */}
+            <div className="relative w-full aspect-[16/9] bg-neutral-950 rounded-xl overflow-hidden border border-neutral-800 flex items-center justify-center">
+              {imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  alt="Stock Scene"
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              ) : (
+                <div className="text-neutral-600 text-xs">Görsel yükleniyor...</div>
+              )}
+            </div>
+
+            {/* Hikaye Metni */}
+            <div className="bg-neutral-950 border border-neutral-800/80 p-5 rounded-xl text-neutral-200 text-sm md:text-base leading-relaxed">
               {currentStep?.storyText}
             </div>
 
-            {/* Options Area (A, B, C) */}
+            {/* Seçenekler (A, B, C) */}
             <div className="flex flex-col gap-3">
               {currentStep?.options.map((option) => (
                 <button
