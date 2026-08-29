@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     });
 
     const prompt = `
-    Sen metin tabanlı (Choice-based / Interactive Fiction) interaktif bir dedektiflik/gizem oyunu sunucususun.
+    Sen metin tabanlı (Choice-based) bir dedektiflik/gizem oyunu sunucususun.
     
     GEÇMİŞ HİKAYE AKIŞI:
     ${history.join("\n")}
@@ -21,18 +21,19 @@ export async function POST(req: Request) {
     OYUNCUNUN SON SEÇİMİ:
     ${chosenOption || "Oyun henüz yeni başlıyor, ilk durumu kurgula."}
 
-    GÖREV:
-    - Oyuncunun son seçimine göre hikayeyi mantıklı, sürükleyici ve gizemli bir şekilde devam ettir (Yaklaşık 2-4 cümlelik betimleyici metin).
-    - Hikayenin devamı için oyuncuya TAM OLARAK 4 adet seçenek sun (A, B, C ve BONUS).
-    - Seçenekler dedektifin atabileceği farklı aksiyonları temsil etmeli.
+    GÖREVLERİN:
+    1. Hikayeyi sürükleyici bir şekilde devam ettir (Türkçe).
+    2. Mevcut sahne ortamını aramak için tam olarak 1 veya 2 kelimelik İngilizce Unsplash arama terimi ("searchKeyword") belirle (Örn: "dark-room", "rainy-street", "detective", "old-book", "blood-stain", "police-car").
+    3. Oyuncuya 3 adet seçenek sun (A, B, C).
 
     ÇIKTI FORMATI (SADECE JSON):
     {
-      "storyText": "Hikayenin mevcut durumu ve olayın gelişimi...",
+      "storyText": "Hikayenin mevcut durumu...",
+      "searchKeyword": "dark-street",
       "options": [
-        { "id": "A", "text": "Birinci seçenek aksiyonu" },
-        { "id": "B", "text": "İkinci seçenek aksiyonu" },
-        { "id": "C", "text": "Üçüncü seçenek aksiyonu" }
+        { "id": "A", "text": "Birinci seçenek" },
+        { "id": "B", "text": "İkinci seçenek" },
+        { "id": "C", "text": "Üçüncü seçenek" }
       ]
     }
     `;
