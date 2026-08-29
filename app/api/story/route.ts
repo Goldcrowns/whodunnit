@@ -13,28 +13,27 @@ export async function POST(req: Request) {
     });
 
     const prompt = `
-    Sen interaktif bir dedektiflik oyununun motorusun.
-    
+    Sen hızlı tempolu bir dedektiflik oyunusun.
+
     GEÇMİŞ HİKAYE:
     ${history.join("\n")}
-    
+
     SON SEÇİM:
     ${chosenOption || "Oyun yeni başladı."}
 
-    ÇOK ÖNEMLİ KURALLAR:
-    1. "storyText" KISMI EN AZ 5, EN FAZLA 10 CÜMLE OLMALI. Uzanıp giden hikaye/roman gibi yazma! Doğrudan aksiyonun sonucunu ve dedektifin önündeki durumu söyle.
-    2. Edebiyat yapma, lafı uzatma.
-    3. Oyuncunun önündeki aksiyona göre tam 3 kısa ve net seçenek (A, B, C) üret.
-    4. "searchKeyword" için 1-2 kelimelik İngilizce görsel arama terimi üret.
+    GÖREVLER:
+    1. "storyText": Sadece yapılan aksiyonun doğrudan sonucunu yaz (Maksimum 10 kısa cümle). Anlatıyı uzatma.
+    2. "imagePrompt": Sahneye özel 2-3 kelimelik İngilizce detay yaz (Örn: "bloody knife on floor", "dark alley rainy night", "police car lights").
+    3. "options": Tam 4 tane net aksiyon seçeneği sun (A, B, C ve Bonus).
 
     ÇIKTI FORMATI (SADECE JSON):
     {
-      "storyText": "Seçimi yaptın ve kapıyı açtın. Odada kanlı bir anahtar duruyor.",
-      "searchKeyword": "dark-room-key",
+      "storyText": "Metin...",
+      "imagePrompt": "İngilizce kelimeler...",
       "options": [
-        { "id": "A", "text": "Anahtarı cebine at ve masayı incele." },
-        { "id": "B", "text": "Kan izlerini takip ederek pencereye git." },
-        { "id": "C", "text": "Arkanı dönüp koridoru kontrol et." }
+        { "id": "A", "text": "Seçenek 1" },
+        { "id": "B", "text": "Seçenek 2" },
+        { "id": "C", "text": "Seçenek 3" }
       ]
     }
     `;
