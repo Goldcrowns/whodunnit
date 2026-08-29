@@ -10,7 +10,7 @@ interface Option {
 
 interface StoryStep {
   storyText: string;
-  imagePrompt: string;
+  searchKeyword: string;
   options: Option[];
 }
 
@@ -31,10 +31,11 @@ export default function InteractiveStoryPage() {
     return sentences.slice(0, sentenceCount).join(" ");
   };
 
-  const updateImage = (prompt: string) => {
-    const cleanPrompt = encodeURIComponent(`dark detective cinematic, ${prompt || "detective case"}`);
-    const seed = Math.floor(Math.random() * 9999);
-    setImageUrl(`https://image.pollinations.ai/prompt/${cleanPrompt}?width=800&height=450&nologo=true&seed=${seed}`);
+  const updateImage = (keyword: string) => {
+    const cleanKeyword = keyword ? encodeURIComponent(keyword.trim().toLowerCase()) : "detective";
+    const sig = Math.floor(Math.random() * 9999);
+    // Unsplash temalı görsel çekimi
+    setImageUrl(`https://source.unsplash.com/800x450/?dark,detective,${cleanKeyword}&sig=${sig}`);
   };
 
   const startNewStory = async () => {
@@ -50,7 +51,7 @@ export default function InteractiveStoryPage() {
       const data: StoryStep = await res.json();
       setCurrentStep(data);
       setHistory([data.storyText]);
-      if (data.imagePrompt) updateImage(data.imagePrompt);
+      if (data.searchKeyword) updateImage(data.searchKeyword);
     } catch (err) {
       console.error("Story error:", err);
     } finally {
@@ -77,7 +78,7 @@ export default function InteractiveStoryPage() {
       const data: StoryStep = await res.json();
       setCurrentStep(data);
       setHistory([...newHistory, data.storyText]);
-      if (data.imagePrompt) updateImage(data.imagePrompt);
+      if (data.searchKeyword) updateImage(data.searchKeyword);
     } catch (err) {
       console.error("Story update error:", err);
     } finally {
@@ -106,24 +107,29 @@ export default function InteractiveStoryPage() {
         {loading ? (
           <div className="min-h-[260px] flex flex-col items-center justify-center gap-2 text-neutral-400">
             <LoaderCircle className="w-7 h-7 animate-spin text-red-600" />
-            <p className="text-xs">Yeni Durum Yükleniyor...</p>
+            <p className="text-xs">Yeni durum yükleniyor...</p>
           </div>
         ) : (
           <>
-            {/* Görsel Alanı */}
+            {/* Görsel Alanı (Garantili Fallback Dahil) */}
             <div className="relative w-full aspect-[16/9] bg-neutral-950 rounded-xl overflow-hidden border border-neutral-800 flex items-center justify-center">
               {imageUrl ? (
                 <img
                   src={imageUrl}
                   alt="Scene"
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Servis patlarsa doğrudan bu güvenli static stok görsele düşer
+                    (e.target as HTMLImageElement).src =
+                      "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80";
+                  }}
                 />
               ) : (
                 <div className="text-neutral-600 text-xs">Görsel Yükleniyor...</div>
               )}
             </div>
 
-            {/* Kod ile 2 cümleye kesilmiş kısa metin */}
+            {/* Kod Tarafında 2 Cümleye Kesilmiş Metin */}
             <div className="bg-neutral-950 border border-neutral-800/80 p-4 rounded-xl text-neutral-200 text-sm leading-snug font-medium">
               {currentStep?.storyText ? truncateStory(currentStep.storyText, 2) : ""}
             </div>
@@ -150,4 +156,4 @@ export default function InteractiveStoryPage() {
       </div>
     </main>
   );
-                                        }
+}
