@@ -5,54 +5,33 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function GET() {
   try {
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json(
+        { error: "GEMINI_API_KEY ortam değişkeni tanımlı değil." },
+        { status: 500 }
+      );
+    }
+
+    // Model tanımı (gemini-flash-lite-latest veya gemini-2.5-flash)
     const model = genAI.getGenerativeModel({
-      model: "gemini-flash-lite",
+      model: "gemini-flash-lite-latest",
       generationConfig: { responseMimeType: "application/json" },
     });
 
     const prompt = `
-    Sen sürükleyici dedektiflik oyunları tasarlayan bir yapay zekasın. 
-    Bana benzersiz, orijinal ve rastgele kurgulanmış bir cinayet/suç vakası oluştur.
-    
-    KURALLAR:
-    1. Mekan, kurban ve hikaye tamamen rastgele olsun.
-    2. Tam olarak 3 adet şüpheli oluştur.
-    3. ŞÜPHELİLERDEN SADECE VE SADECE BİR TANESİNİN "isGuilty" DEĞERİ true OLSUN, DİĞER İKİSİ false OLSUN.
-    4. Yanıtı SADECE geçerli bir JSON nesnesi olarak ver. Ekstra açıklama veya markdown ekleme.
+    Sen bir dedektiflik oyunu yapay zekasısın.
+    Bana Türkçe olarak 3 şüpheli içeren rastgele bir suç vakası kurgula.
+    Şüphelilerden SADECE BİRİNİN "isGuilty" değeri true olsun, diğer ikisi false olsun.
 
-    İSTENEN JSON FORMATI:
+    Yanıtı SADECE aşağıdaki JSON formatında ver:
     {
-      "caseTitle": "Olay/Vaka Başlığı",
-      "locationDescription": "Olay yerinin ve havanın detaylı, gizemli betimlemesi",
+      "caseTitle": "Vaka Başlığı",
+      "locationDescription": "Olay yeri açıklaması",
       "initialImageUrl": null,
       "suspects": [
-        {
-          "id": "s1",
-          "name": "Rastgele İsim",
-          "role": "Mesleği / Rolü",
-          "alibiPrompt": "Olay anındaki mazereti ve arka plan bilgisi",
-          "dialogue": "İlk sorgudaki tedirgin veya kendinden emin açılış cümlesi",
-          "imageUrl": null,
-          "isGuilty": false
-        },
-        {
-          "id": "s2",
-          "name": "Rastgele İsim",
-          "role": "Mesleği / Rolü",
-          "alibiPrompt": "Olay anındaki mazereti ve arka plan bilgisi",
-          "dialogue": "İlk sorgudaki açılış cümlesi",
-          "imageUrl": null,
-          "isGuilty": true
-        },
-        {
-          "id": "s3",
-          "name": "Rastgele İsim",
-          "role": "Mesleği / Rolü",
-          "alibiPrompt": "Olay anındaki mazereti ve arka plan bilgisi",
-          "dialogue": "İlk sorgudaki açılış cümlesi",
-          "imageUrl": null,
-          "isGuilty": false
-        }
+        { "id": "s1", "name": "İsim 1", "role": "Rol 1", "alibiPrompt": "", "dialogue": "Açılış cümlesi 1", "imageUrl": null, "isGuilty": false },
+        { "id": "s2", "name": "İsim 2", "role": "Rol 2", "alibiPrompt": "", "dialogue": "Açılış cümlesi 2", "imageUrl": null, "isGuilty": true },
+        { "id": "s3", "name": "İsim 3", "role": "Rol 3", "alibiPrompt": "", "dialogue": "Açılış cümlesi 3", "imageUrl": null, "isGuilty": false }
       ]
     }
     `;
@@ -62,10 +41,10 @@ export async function GET() {
     const caseData = JSON.parse(responseText);
 
     return NextResponse.json(caseData);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Vaka üretme hatası:", error);
     return NextResponse.json(
-      { error: "Yapay zeka vaka oluştururken bir hata oluştu." },
+      { error: error?.message || "Vaka oluşturulurken sunucu hatası oluştu." },
       { status: 500 }
     );
   }
