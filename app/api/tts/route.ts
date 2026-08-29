@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
-    const { text, voiceId = '21m00Tcm4TlvDq8ikWAM' } = await req.json();
+    const { text, voiceId = 'pNInz6obpgDQGcFmaJgB' } = await req.json();
 
     if (!text) {
       return NextResponse.json({ error: 'Metin girmediniz.' }, { status: 400 });
