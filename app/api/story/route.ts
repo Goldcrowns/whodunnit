@@ -13,27 +13,28 @@ export async function POST(req: Request) {
     });
 
     const prompt = `
-    Sen metin tabanlı (Choice-based) bir dedektiflik/gizem oyunu sunucususun.
+    Sen interaktif bir dedektiflik oyununun motorusun.
     
-    GEÇMİŞ HİKAYE AKIŞI:
+    GEÇMİŞ HİKAYE:
     ${history.join("\n")}
     
-    OYUNCUNUN SON SEÇİMİ:
-    ${chosenOption || "Oyun henüz yeni başlıyor, ilk durumu kurgula."}
+    SON SEÇİM:
+    ${chosenOption || "Oyun yeni başladı."}
 
-    GÖREVLERİN:
-    1. Hikayeyi sürükleyici bir şekilde devam ettir (Türkçe).
-    2. Mevcut sahne ortamı için 1-2 kelimelik İngilizce görsel anahtar kelimesi ("searchKeyword") belirle (Örn: "rainy-street", "detective-office", "old-letter", "crime-scene", "shadowy-figure").
-    3. Oyuncuya 3 adet seçenek sun (A, B, C ve BONUS).
+    ÇOK ÖNEMLİ KURALLAR:
+    1. "storyText" KISMI EN AZ 5, EN FAZLA 10 CÜMLE OLMALI. Uzanıp giden hikaye/roman gibi yazma! Doğrudan aksiyonun sonucunu ve dedektifin önündeki durumu söyle.
+    2. Edebiyat yapma, lafı uzatma.
+    3. Oyuncunun önündeki aksiyona göre tam 3 kısa ve net seçenek (A, B, C) üret.
+    4. "searchKeyword" için 1-2 kelimelik İngilizce görsel arama terimi üret.
 
     ÇIKTI FORMATI (SADECE JSON):
     {
-      "storyText": "Hikayenin mevcut durumu...",
-      "searchKeyword": "detective-office",
+      "storyText": "Seçimi yaptın ve kapıyı açtın. Odada kanlı bir anahtar duruyor.",
+      "searchKeyword": "dark-room-key",
       "options": [
-        { "id": "A", "text": "Birinci seçenek" },
-        { "id": "B", "text": "İkinci seçenek" },
-        { "id": "C", "text": "Üçüncü seçenek" }
+        { "id": "A", "text": "Anahtarı cebine at ve masayı incele." },
+        { "id": "B", "text": "Kan izlerini takip ederek pencereye git." },
+        { "id": "C", "text": "Arkanı dönüp koridoru kontrol et." }
       ]
     }
     `;
