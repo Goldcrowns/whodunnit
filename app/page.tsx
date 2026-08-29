@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { LoaderCircle, BookOpen, RefreshCw } from "lucide-react";
 
 interface Option {
@@ -11,7 +10,7 @@ interface Option {
 
 interface StoryStep {
   storyText: string;
-  searchKeyword: string; // Stok fotoğraf aramak için İngilizce kelime (Örn: "dark alley", "detective office")
+  searchKeyword: string;
   options: Option[];
 }
 
@@ -26,9 +25,9 @@ export default function InteractiveStoryPage() {
   }, []);
 
   const fetchStockImage = (keyword: string) => {
-    // Unsplash Source kullanarak keyword'e uygun gerçek stok fotoğrafı getirir
-    const encodedKeyword = encodeURIComponent(keyword);
-    setImageUrl(`https://source.unsplash.com/800x450/?${encodedKeyword}`);
+    // Keyword'den tutarlı bir seed üreterek Picsum üzerinden kaliteli stok resmi çeker
+    const hash = (keyword || "detective").split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    setImageUrl(`https://picsum.photos/seed/${hash}/800/450`);
   };
 
   const startNewStory = async () => {
@@ -86,8 +85,8 @@ export default function InteractiveStoryPage() {
         {/* Header */}
         <header className="flex justify-between items-center border-b border-neutral-800 pb-4">
           <div className="flex items-center gap-2 text-red-500 font-bold tracking-wider">
-            <BookOpen className="w-5 h-5" />
-            <span>INTERACTIVE DETECTIVE</span>
+            <Search className="w-5 h-5" />
+            <span>WHODUNNİT</span>
           </div>
           <button
             onClick={startNewStory}
@@ -100,19 +99,21 @@ export default function InteractiveStoryPage() {
         {loading ? (
           <div className="min-h-[300px] flex flex-col items-center justify-center gap-3 text-neutral-400">
             <LoaderCircle className="w-8 h-8 animate-spin text-red-600" />
-            <p className="text-xs tracking-wide">Hikaye ve mekan fotoğrafları hazırlanıyor...</p>
+            <p className="text-xs tracking-wide">Hikaye ve görseller yükleniyor...</p>
           </div>
         ) : (
           <>
-            {/* Stok Fotoğraf Alanı */}
+            {/* Sahne Görsel Alanı */}
             <div className="relative w-full aspect-[16/9] bg-neutral-950 rounded-xl overflow-hidden border border-neutral-800 flex items-center justify-center">
               {imageUrl ? (
-                <Image
+                <img
                   src={imageUrl}
                   alt="Stock Scene"
-                  fill
-                  className="object-cover"
-                  unoptimized
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Yükleme hatası olursa doğrudan Unsplash genel stok görseline düşürür
+                    e.currentTarget.src = "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&q=80";
+                  }}
                 />
               ) : (
                 <div className="text-neutral-600 text-xs">Görsel yükleniyor...</div>
