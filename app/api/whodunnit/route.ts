@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenAI, Type } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
 
 // process.env.GEMINI_API_KEY çevresel değişkenini otomatik algılar
-const ai = new GoogleGenAI({});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(request: Request) {
   try {
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
     // 1. DİNAMİK SENARYO VE İPUCU ÜRETİMİ (AI)
     if (action === 'GENERATE_CASE') {
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-flash-lite-latest',
         contents: `Sen Criminal Case oyunları için sürükleyici vaka senaryoları yazan bir dedektiflik yazarısın. 
           Oyuncunun mantık yürüterek çözebileceği özgün bir cinayet vaka senaryosu kurgula. 
           Şüphelilerden tam olarak 1 tanesi katil olmalı ve ipuçlarında bu katilin ifadesiyle çelişen gizli bir detay bulunmalıdır.`,
