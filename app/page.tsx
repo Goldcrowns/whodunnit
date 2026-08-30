@@ -81,10 +81,11 @@ export default function WhodunnitGamePage() {
       }
     } catch (err) {
       console.error("Vaka yüklenirken hata oluştu:", err);
-    } font-medium {
+    } finally {
       setLoading(false);
     }
   };
+  
 
   const handleVerifyAccusation = async () => {
     if (!selectedSuspectId || !caseData || verifying) return;
